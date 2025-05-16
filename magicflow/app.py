@@ -6,6 +6,7 @@ from magicflow.libs.metadata import Metadata
 from magicflow.config.config import settings
 from magicflow.messaging.event_dispatcher import EventDispatcher
 from magicflow.messaging.event_handler import EventHandler
+from magicflow.messaging.health_server import start_health_server
 
 logger = LoggingService().getLogger(__name__)
 
@@ -28,18 +29,26 @@ def signal_handler(s,h):
 def event_handler():
     logger.info("Starting event handler")
     try:
+        # Start health server
+        health_thread = start_health_server(dispatcher)
+        
         handler.start()
         dispatcher.start()
+        
+        # Wait for the handler thread to complete
+        handler.join()
+        dispatcher.join()
+        
     except KeyboardInterrupt as e:
-		# Set the alive attribute to false
+        # Set the alive attribute to false
         handler.alive = False
         dispatcher.alive = False
-		# Block until child thread is joined back to the parent
+        # Block until child thread is joined back to the parent
         handler.stop()
         handler.join()
         dispatcher.stop()
         dispatcher.join()
-		# Exit with error code
+        # Exit with error code
         sys.exit(e)
 
 
@@ -66,7 +75,5 @@ if __name__ == '__main__':
         environment = os.environ.get('ENVIRONMENT'),
         cloud = os.environ.get('CLOUD')
     )
-
-
 
     event_handler()

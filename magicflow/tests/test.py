@@ -3,17 +3,18 @@ import time
 import base64
 
 import requests
-from dynaconf import Dynaconf
 import yaml
+from typing import Any
 from magicflow.config import settings
 import gitlab
 from xml.dom.expatbuilder import Namespaces
-
-
 from magicflow.messaging import CommandMessage
 from magicflow.libs.yaml_dumper import CustomDumper
 from magicflow.libs.gitlab_service import GitlabDriver
-from loguru import logger
+from magicflow.config.config import settings
+from magicflow.libs.logging_service import LoggingService
+
+logger = LoggingService.get_logger(__name__)
 
 
 msg = {
@@ -50,7 +51,7 @@ msg = {
 
 class Jobs:
 
-    def __init__(self, config: Dynaconf):
+    def __init__(self, config: Any):
         self._config = config
         self.gitlab_api_token = self._config.get('gitlab_api_token')
 

@@ -1,6 +1,6 @@
 import sys
 from queue import Queue
-from typing import Callable, TYPE_CHECKING
+from typing import Callable, TYPE_CHECKING, Any
 
 from magicflow.config.config import settings
 
@@ -20,7 +20,7 @@ from magicflow.libs.logging_service import LoggingService
 
 logger = LoggingService().getLogger(__name__)
 
-def _default_kafka_driver_factory(settings: settings) -> 'KafkaDriver':
+def _default_kafka_driver_factory(settings: Any) -> 'KafkaDriver':
     from magicflow.messaging.kafka_driver import KafkaDriver
     consume_topic = settings.get("kafka_consume_queue_topic")
     if not consume_topic:
@@ -31,7 +31,7 @@ def _default_kafka_driver_factory(settings: settings) -> 'KafkaDriver':
     return KafkaDriver(config=settings, queue=consume_topic)
 
 
-def _default_job_runner_factory(settings: settings) -> JobRunner:
+def _default_job_runner_factory(settings: Any) -> JobRunner:
     return JobRunner(settings)
 
 class EventHandler(DefaultEventProcessor):
@@ -41,9 +41,9 @@ class EventHandler(DefaultEventProcessor):
         thread_id: int,
         name: str,
         internal_queue: Queue,
-        settings: settings,
-        kafka_driver_factory: Callable[[settings], 'KafkaDriver'] = _default_kafka_driver_factory,  
-        job_runner_factory: Callable[[settings], JobRunner] = _default_job_runner_factory,
+        settings: Any,
+        kafka_driver_factory: Callable[[Any], 'KafkaDriver'] = _default_kafka_driver_factory,  
+        job_runner_factory: Callable[[Any], JobRunner] = _default_job_runner_factory,
     ):
         super(EventHandler, self).__init__(thread_id, name, internal_queue, settings,
                                            kafka_driver_factory)
