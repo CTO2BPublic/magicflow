@@ -1,0 +1,105 @@
+{{- $instance := .Values.metadata.instance | default "client" }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: magicflow
+   labels:
+      app: magicflow
+      project: magicflow
+   namespace: {{ .Release.Namespace }}
+spec:
+   selector:
+      matchLabels:
+         app: magicflow
+   strategy:
+      type: Recreate
+   replicas: 1
+   template:
+      metadata:
+         labels:
+            app: magicflow
+      spec:
+         serviceAccountName: magicflow
+         terminationGracePeriodSeconds: 3
+         initContainers:
+          - name: kafka-truststore
+            image: registry.gitlab.com/cto2bprivate/main/applications/magicflow:{{ .Values.image.tag }}
+            imagePullPolicy: Always
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "cp /ca/ca.crt /truststore/"
+            env:      
+            resources:
+              limits:
+                memory: "512Mi"
+                cpu: 500m
+              requests:
+                memory: "256Mi"
+                cpu: 100m
+            volumeMounts:
+              - name: truststore
+                mountPath: /truststore
+              - name: ca
+                mountPath: /ca
+                readOnly: true
+         containers:
+         - image: registry.gitlab.com/cto2bprivate/main/applications/magicflow:{{ .Values.image.tag }}
+           name: magicflow
+           imagePullPolicy: Always
+           securityContext:
+            runAsUser: 1001
+            runAsGroup: 1001
+           resources:
+              limits:
+                memory: "2Gi"
+                cpu: 2300m
+              requests:
+                memory: "256Mi"
+                cpu: 100m
+           env:
+             - name: LOGLEVEL
+               value: {{ .Values.logging }}
+             - name: KAFKA_SSL_TRUSTSTORE_PASSWORD
+               value: {{ .Values.truststorePassword }}
+              #  valueFrom:
+              #    secretKeyRef:
+              #      name: kafka-truststore-secret-{{ $instance }}
+              #      key: truststore-password  
+             - name: KAFKA_BOOTSTRAP_SERVERS
+               value: {{ .Values.bootstrapServers }}
+             - name: APP_SASL_PASSWORD
+               valueFrom:
+                 secretKeyRef:
+                   name: kafka-magicflow-user
+                   key: password
+             - name: CLOUD
+               value: {{ .Values.metadata.cloud | default "aws" }}
+             - name: ENVIRONMENT
+               value: {{ .Values.metadata.environment | default "development" }}
+             - name: STAGE
+               value: {{ .Values.metadata.stage | default "dev" }}
+           ports:
+           - containerPort: 8080
+           livenessProbe:
+              httpGet:
+                 path: /apps
+                 port: 8080
+              initialDelaySeconds: 5
+              periodSeconds: 5
+              timeoutSeconds: 5
+              successThreshold: 1
+              failureThreshold: 3    
+           volumeMounts:
+            - name: truststore
+              mountPath: /truststore    
+         imagePullSecrets:
+           - name: registry-credentials                                    
+         volumes:
+           - name: truststore
+             emptyDir: {}
+           - name: ca
+             secret:
+              secretName: kafka-sasl-cert
+              optional: false        

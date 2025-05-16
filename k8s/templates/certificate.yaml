@@ -1,0 +1,23 @@
+# {{- $instance := .Values.metadata.instance | default "client" }}
+# {{- if .Values.enableKafka }}
+# {{- if .Values.truststoreCert }}
+# apiVersion: cert-manager.io/v1
+# kind: Certificate
+# metadata:
+#   name: kafka-acl-cert-{{ $instance }}
+#   namespace: {{ .Release.Namespace }}
+# spec:
+#   commonName: kafka-acl-cert-{{ $instance }}
+#   dnsNames:
+#   - '*.kafka-gitops-{{ $instance }}.{{ .Release.Namespace }}.svc'
+#   duration: 8760h0m0s
+#   issuerRef:
+#     kind: ClusterIssuer
+#     name: generic-cluster-ca
+#   privateKey:
+#     algorithm: RSA
+#     size: 2048
+#   renewBefore: 180h0m0s
+#   secretName: kafka-acl-cert-{{ $instance }}
+# {{- end }}
+# {{- end }}

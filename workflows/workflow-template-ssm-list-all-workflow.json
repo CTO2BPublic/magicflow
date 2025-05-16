@@ -1,0 +1,32 @@
+{
+    "name": "SSM list all workflow",
+    "template": "true",
+    "description": "To list all secrets in SSM",
+    "category": "Provisioning",
+    "type": "Secrets",
+
+    "parameters": [
+        {
+          "name": "Environment",
+          "type": "target-environment",
+          "value": "",
+          "description": "Target environment to run workflow on"
+      }
+    ],
+    "jobs": [
+        {
+            "name": "ssm_list_all",
+            "description": "Lists all SSM secrets",
+            "order": 0,
+            "controller": "",
+            "input": {
+                "name": "",
+                "namespace": ""
+            },
+            "output": {
+                "error": {}
+            },
+            "status": "New"
+        }
+    ]
+}

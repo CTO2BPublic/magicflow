@@ -1,0 +1,42 @@
+{
+    "name": "SSM list workflow",
+    "template": "true",
+    "description": "To list secrets for an application",
+    "category": "Provisioning",
+    "type": "Secrets",
+
+    "parameters": [
+        {
+            "name": "namespace",
+            "value": "",
+            "description": "Namespace of an application"
+        },
+        {
+            "name": "name",
+            "value": "",
+            "description": "Name of an application"
+        },
+        {
+          "name": "Environment",
+          "type": "target-environment",
+          "value": "",
+          "description": "Target environment to run workflow on"
+      }
+    ],
+    "jobs": [
+        {
+            "name": "ssm_list",
+            "description": "Lists SSM secrets for an application",
+            "order": 0,
+            "controller": "",
+            "input": {
+                "name": "",
+                "namespace": ""
+            },
+            "output": {
+                "error": {}
+            },
+            "status": "New"
+        }
+    ]
+}

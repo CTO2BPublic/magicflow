@@ -1,0 +1,23 @@
+{{- if .Values.kafkaACL.enabled }}
+---
+apiVersion: sview.cto2b.eu/v1
+kind: Kacl
+metadata:
+  labels:
+    cluster: {{ .Values.bootstrapServers | quote }}
+    namespace: {{ .Values.metadata.namespace | default "sview" }}
+    stage: {{ .Values.metadata.stage | default "dev" }}
+    environment: {{ .Values.metadata.environment | default "development" }}
+  name: magicflow-acl
+spec:
+  capability:
+    - name: cto2b.magicflow
+      users:
+        - idempotent: false
+          name: magicflow-user
+      acls: 
+        - role: multiadmin
+          topic: cto2b.magicflow.
+          user: magicflow-user
+  cluster: {{ printf "%s:%d" .Values.bootstrapServers (int .Values.port) | quote }}
+{{- end }}

@@ -1,0 +1,19 @@
+global:
+  values:
+    {% if input.cloud_provider == 'gcp' %}
+    cloud_provider: gcp
+    dns_name: gcp.cto2b.eu
+    {% endif %}
+    {% if input.cloud_provider == 'azure' %}
+    cloud_provider: azure
+    dns_name: azure.cto2b.eu
+    {% endif %}
+    {% if input.cloud_provider == 'oci' %}
+    cloud_provider: oci
+    dns_name: oci.cto2b.eu
+    {% endif %}
+    {% if input.cloud_provider == 'aws' %}
+    cloud_provider: aws
+    dns_name: aws.cto2b.eu
+    {% endif %}
+

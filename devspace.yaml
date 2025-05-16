@@ -1,0 +1,61 @@
+version: v2beta1
+name: docker-compose
+
+localRegistry:
+  persistence:
+    enabled: true
+    size: 5Gi
+#    storageClassName: temporary-enc-sc
+
+# This is a list of `images` that DevSpace can build for this project
+# We recommend to skip image building during development (devspace dev) as much as possible
+#images:
+#  watcher:
+#    image: watcher
+#    dockerfile: ./Dockerfile
+#    context: ./
+#    injectRestartHelper: false
+
+
+pullSecrets:
+  gitlab-registry:
+    registry: registry.gitlab.com
+    secret: registry-credentials
+
+
+deployments:
+  magicflow:
+    helm:
+      chart:
+        path: ./k8s/
+      values:
+        metadata:
+          name: magicflow
+          labels:
+            app: magicflow
+        version: latest
+  
+dev:
+  magicflow:
+    labelSelector:
+      app: magicflow
+    #command: ["/bin/sh", "-c", "tail -f /dev/null"]  
+    command: ["python", "-m", "magicflow.app"]
+    env:
+    - name: APP_LOGLEVEL
+      value: "debug"  
+    - name: APP_BOOTSTRAP_SERVERS
+      value: "kafka-client-kafka-bootstrap.sview.svc.cluster.local:9093"
+    - name: PYTHONASYNCIODEBUG
+      value: "1"  
+    - name: CLOUD
+      value: "aws"
+    - name: ENVIRONMENT
+      value: "development"
+    - name: STAGE
+      value: "dev"
+    sync:
+      - path: magicflow/:/magicflow/
+        startContainer: false # Will start the container after sync is done
+        onUpload:
+          restartContainer: true    

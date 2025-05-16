@@ -1,0 +1,14 @@
+
+image:
+  repository: magicflow
+  tag: "latest"
+  
+logging: info
+truststoreCert: false
+bootstrapServers: "kafka-client-kafka-bootstrap.sview.svc.cluster.local"
+port: 9093
+truststorePassword: "changeme"
+kafkaACL:
+  enabled: true
+
+metadata: {}

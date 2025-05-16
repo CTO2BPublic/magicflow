@@ -1,0 +1,8 @@
+values:
+  version: {{ input.es_version }}
+  namespace:
+    name: {{ input.namespace }}
+  annotations:
+    traffic.sidecar.istio.io/includeInboundPorts: "*"
+    traffic.sidecar.istio.io/excludeOutboundPorts: "9300"
+    traffic.sidecar.istio.io/excludeInboundPorts: "9300"

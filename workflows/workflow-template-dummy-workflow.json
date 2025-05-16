@@ -1,0 +1,80 @@
+{
+    "name": "Dummy workflow",
+    "template": "true",
+    "description": "For testing and dev purposes",
+    "category": "Examples",
+    "type": "No-op",
+
+    "parameters": [{
+            "name": "mr_id",
+            "value": "DP-XXX",
+            "description": "JIRA ticket number which to add to commit messages"
+        },
+        {
+            "name": "Environment",
+            "type": "target-environment",
+            "value": "",
+            "description": "Target environment to run workflow on"
+        },
+        {
+            "name": "Code",
+            "type": "yaml",
+            "value": "list:\n  - one\n   - two",
+            "description": "Example code block field"
+        },
+        {
+            "name": "features",
+            "value": "",
+            "type": "checkbox-group",
+            "values": {
+                "features/elasticsearch.feature": true,
+                "features/mysql.feature": true,
+                "features/postgresql.feature": true,
+                "features/monolith.feature": false
+            },
+            "description": "Features to test"
+        },
+        {
+            "name": "start_date",
+            "description": "Start date (In your local timezone)",
+            "type": "date",
+            "value": "2023-05-05T06:00:00.007Z"
+        },
+        {
+            "name": "incident_description",
+            "description": "Incident description",
+            "type": "textarea",
+            "value": "We will upgrade the Platform in PROD to v1.2.1 version. We expect about 1-2 mins of downtime during the specified interval. Thank you for your understanding."
+        }
+    ],
+    "jobs": [{
+            "name": "dummy_job",
+            "description": "Dummy job. Does nothing.",
+            "order": 0,
+            "controller": "",
+            "input": {
+                "mr_id": "",
+                "start_date": "",
+                "features": "",
+                "incident_description": ""
+            },
+            "output": {
+                "error": {}
+            },
+            "status": "New"
+        },
+        {
+            "name": "dummy_job",
+            "description": "Dummy job. Does nothing.",
+            "order": 0,
+            "controller": "",
+            "input": {
+                "mr_id": ""
+            },
+            "output": {
+                "error": {}
+            },
+            "status": "New"
+        }
+    ]
+}

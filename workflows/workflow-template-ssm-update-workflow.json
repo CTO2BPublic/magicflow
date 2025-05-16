@@ -1,0 +1,55 @@
+{
+    "name": "SSM update workflow",
+    "template": "true",
+    "description": "To update/create secrets for an application",
+    "category": "Provisioning",
+    "type": "Secrets",
+
+    "parameters": [
+        {
+            "name": "namespace",
+            "value": "",
+            "description": "Namespace of an application"
+        },
+        {
+            "name": "name",
+            "value": "",
+            "description": "Name of an application"
+        },
+        {
+          "name": "Environment",
+          "type": "target-environment",
+          "value": "",
+          "description": "Target environment to run workflow on"
+      },        
+        {
+            "name": "values",
+            "type": "yaml",
+            "value": "SOME: \"Value\"\r\nBLAH: \"Value2\"",
+            "description": "Values to be updated/created in SSM"
+        },
+        {
+            "name": "target-environment",
+            "value": "",
+            "type": "target-environment",
+            "description": "Name of the environment"
+        }
+    ],
+    "jobs": [
+        {
+            "name": "ssm_update",
+            "description": "Update/create SSM secrets for an application",
+            "order": 0,
+            "controller": "",
+            "input": {
+                "values": "",
+                "name": "",
+                "namespace": ""
+            },
+            "output": {
+                "error": {}
+            },
+            "status": "New"
+        }
+    ]
+}

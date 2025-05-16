@@ -1,0 +1,22 @@
+[default]
+log_level = "debug"
+token_file = "/run/secrets/kubernetes.io/serviceaccount/token"
+controller_uri = 'http://sview-controller.sview/services/'
+bootstrap_servers = "kafka-shared1-kafka-bootstrap.kafka-sasl:9093"
+sasl_mechanism = "SCRAM-SHA-512"
+security_protocol = "SASL_SSL"
+sasl_username = "magicflow-user"
+sasl_password = "changeme"
+ssl_ca_location = "/truststore/ca.crt"
+group_id = "cto2b.magicflow.group1"
+auto_offset_reset = "earliest"
+request_timeout_ms = "10000"
+session_timeout_ms = "45000"
+heartbeat_interval_ms = "3000"
+auto_commit_interval_ms = "5000"
+kafka_retries = "5"
+retry_backoff_ms = "500"
+topic = "audit"
+kafka_consume_queue_topic="cto2b.magicflow.workflows.worker.job"
+kafka_report_queue_topic="cto2b.magicflow.workflows.worker.status"
+gitlab_api_token='glpat-123'

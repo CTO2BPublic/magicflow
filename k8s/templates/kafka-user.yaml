@@ -1,0 +1,11 @@
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  labels:
+    strimzi.io/cluster: kafka-client
+  name: magicflow-user
+  namespace: {{ .Release.Namespace }}
+spec:
+  authentication:
+    type: scram-sha-512
