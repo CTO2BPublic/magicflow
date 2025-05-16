@@ -27,7 +27,7 @@ jobs:
 
       - name: Set up Docker image name
         id: vars
-        run: echo "IMAGE=ghcr.io/${{ github.repository }}" >> $GITHUB_ENV
+        run: echo "IMAGE=ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       - name: Build Docker image
         run: docker build -t $IMAGE . 
