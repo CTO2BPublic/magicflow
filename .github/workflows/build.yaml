@@ -3,7 +3,9 @@ name: Build and Push MagicFlow Docker Image
 on:
   push:
     branches:
-      - main  # or your default branch
+      - main
+    tags:
+      - 'v*'  # Trigger on version tags
 
 jobs:
   build-and-push:
@@ -11,8 +13,8 @@ jobs:
 
     permissions:
       contents: read
-      packages: write  # Needed to push to GitHub Container Registry
-      id-token: write  # Required for OIDC auth if using later
+      packages: write
+      id-token: write
 
     steps:
       - name: Checkout code
@@ -27,10 +29,26 @@ jobs:
 
       - name: Set up Docker image name
         id: vars
-        run: echo "IMAGE=ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+        run: |
+          REPO_LOWER=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            # For tags, use the tag version
+            TAG=${GITHUB_REF#refs/tags/}
+            echo "IMAGE=ghcr.io/$REPO_LOWER:$TAG" >> $GITHUB_ENV
+            echo "LATEST=ghcr.io/$REPO_LOWER:latest" >> $GITHUB_ENV
+          else
+            # For main branch, use latest
+            echo "IMAGE=ghcr.io/$REPO_LOWER:latest" >> $GITHUB_ENV
+          fi
 
       - name: Build Docker image
-        run: docker build -t $IMAGE . 
+        run: docker build -t $IMAGE .
 
       - name: Push Docker image
         run: docker push $IMAGE
+
+      - name: Push latest tag for releases
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          docker tag $IMAGE $LATEST
+          docker push $LATEST
