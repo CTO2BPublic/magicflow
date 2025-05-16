@@ -1,13 +1,10 @@
 from unittest.mock import MagicMock
 from unittest.mock import patch
-
-from dynaconf import Dynaconf
-
 from magicflow.jobs import Jobs
 from magicflow.messaging import CommandMessage
 from magicflow.libs.gitlab_service import GitlabDriver
-
-
+from magicflow.config.config import settings
+from typing import Any
 def mocked_requests_get_factory(url, response):
 
     def mocked_requests_get(*args, **kwargs):
@@ -31,7 +28,7 @@ def mocked_requests_get_factory(url, response):
 
 
 class TestJobs:
-    _settings: Dynaconf = None
+    _settings: Any = None
     _jobs: Jobs = None
     _cmd_data: dict = None
 
@@ -46,10 +43,10 @@ class TestJobs:
         cls._cmd_data = MagicMock(
             return_value={
                 "input": {
-                    "environment": "abank",
+                    "environment": "development",
                     "stage": "dev",
-                    "namespace": "monolith",
-                    "instance": "monolith123",
+                    "namespace": "test",
+                    "instance": "mock",
                     "service": "mysql"
                 }
             })
@@ -61,18 +58,18 @@ class TestJobs:
         json_return_data = [
             {
                 "Metadata": {
-                    "Environment": "dataazure123",
-                    "Stage": "dev123",
-                    "Namespace": "redis-monolith123",
-                    "Instance": "monolith123",
+                    "Environment": "development2",
+                    "Stage": "dev",
+                    "Namespace": "test",
+                    "Instance": "mock",
                 },
             },
             {
                 "Metadata": {
-                    "Environment": "dasdfzure123",
-                    "Stage": "dev131",
-                    "Namespace": "redis-monolith123",
-                    "Instance": "monolith123",
+                    "Environment": "development3",
+                    "Stage": "dev",
+                    "Namespace": "test",
+                    "Instance": "mock",
                 },
             },
         ]
@@ -90,18 +87,18 @@ class TestJobs:
         json_return_data = [
             {
                 "Metadata": {
-                    "Environment": "dataazure123",
-                    "Stage": "dev123",
-                    "Namespace": "redis-monolith123",
-                    "Instance": "monolith123",
+                    "Environment": "development",
+                    "Stage": "dev",
+                    "Namespace": "test",
+                    "Instance": "mock",
                 },
             },
             {
                 "Metadata": {
-                    "Environment": "abank",
+                    "Environment": "development2",
                     "Stage": "dev",
-                    "Namespace": "monolith",
-                    "Instance": "monolith123",
+                    "Namespace": "test",
+                    "Instance": "mock",
                 },
             },
         ]

@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Any
 from magicflow.config.config import settings
 from magicflow.libs.logging_service import LoggingService
 from magicflow.messaging.kafka_connect import KafkaConnect
@@ -8,7 +8,7 @@ logger = LoggingService().getLogger(__name__)
 from magicflow.messaging.exceptions import QueueConnectionError, QueueAuthError
 
 class KafkaDriver:
-    def __init__(self, config: settings, queue: str):
+    def __init__(self, config: Any, queue: str):
         self._config = config
         self._queue = queue
         self._kafka_connect = KafkaConnect()

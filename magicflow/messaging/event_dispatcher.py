@@ -1,6 +1,6 @@
 import sys
 from queue import Queue
-from typing import Callable, TYPE_CHECKING
+from typing import Callable, TYPE_CHECKING, Any
 from magicflow.config.config import settings
 from magicflow.libs.logging_service import LoggingService
 
@@ -13,7 +13,7 @@ from magicflow.messaging import TerminationMessage
 if TYPE_CHECKING:
     from magicflow.messaging.kafka_driver import KafkaDriver
 
-def _default_kafka_driver_factory(settings: settings) -> 'KafkaDriver':
+def _default_kafka_driver_factory(settings: Any) -> 'KafkaDriver':
     from magicflow.messaging.kafka_driver import KafkaDriver
     # This dispatcher publishes events, so it needs the report/events topic.
     publish_topic = settings.get("kafka_report_queue_topic") 
@@ -31,8 +31,8 @@ class EventDispatcher(DefaultEventProcessor):
         thread_id: int,
         name: str,
         internal_queue: Queue,
-        settings: settings,
-        kafka_driver_factory: Callable[[settings], 'KafkaDriver'] = _default_kafka_driver_factory,  
+        settings: Any,
+        kafka_driver_factory: Callable[[Any], 'KafkaDriver'] = _default_kafka_driver_factory,  
     ):
         super(EventDispatcher, self).__init__(thread_id, name, internal_queue, settings,
                                               kafka_driver_factory)

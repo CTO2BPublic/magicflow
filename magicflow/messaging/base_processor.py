@@ -1,7 +1,7 @@
 import threading
 from abc import ABC
 from queue import Queue
-from typing import Callable, TYPE_CHECKING
+from typing import Callable, TYPE_CHECKING, Any
 from magicflow.config.config import settings
 
 if TYPE_CHECKING:
@@ -15,8 +15,8 @@ class DefaultEventProcessor(ABC, threading.Thread):
         thread_id: int,
         name: str,
         internal_queue: Queue,
-        settings: settings,
-        kafka_driver_factory: Callable[[settings], 'KafkaDriver'],
+        settings: Any,
+        kafka_driver_factory: Callable[[Any], 'KafkaDriver'],
     ):
         threading.Thread.__init__(self)
         self._settings = settings

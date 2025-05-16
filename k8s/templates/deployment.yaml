@@ -84,13 +84,20 @@ spec:
            - containerPort: 8080
            livenessProbe:
               httpGet:
-                 path: /apps
+                 path: /health
                  port: 8080
               initialDelaySeconds: 5
               periodSeconds: 5
               timeoutSeconds: 5
               successThreshold: 1
-              failureThreshold: 3    
+              failureThreshold: 3
+           readinessProbe:
+              httpGet:
+                 path: /health
+                 port: 8080
+              initialDelaySeconds: 5
+              periodSeconds: 5
+              timeoutSeconds: 5
            volumeMounts:
             - name: truststore
               mountPath: /truststore    
