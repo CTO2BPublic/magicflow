@@ -1,0 +1,142 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaNodePool
+metadata:
+  name: kafka-client
+  labels:
+    strimzi.io/cluster: kafka-client
+spec:
+  replicas: 1
+  roles:
+    - controller
+    - broker
+  storage:
+    type: jbod
+    volumes:
+      - id: 0
+        type: ephemeral
+        size: 1Gi
+  resources:      
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+  jvmOptions:
+    -Xms: 1G
+    -Xmx: 2G
+
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: kafka-client
+  annotations:
+    strimzi.io/node-pools: enabled
+    strimzi.io/kraft: enabled  
+spec:
+  clusterCa:
+    renewalDays: 40
+    validityDays: 768
+    generateCertificateAuthority: true
+  clientsCa:
+    renewalDays: 30
+    validityDays: 365
+    generateCertificateAuthority: true
+  kafka:
+    version: 3.9.0
+    metadataVersion: 3.9.0
+    replicas: 3
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+      - name: tls
+        port: 9093
+        type: internal
+        tls: true
+        authentication:
+          type: scram-sha-512
+        # configuration:
+        #   brokerCertChainAndKey:
+        #     secretName: kafka-broker-tls
+        #     certificate: tls.crt
+        #     key: tls.key
+    authorization:
+      superUsers:
+        - super-user
+        - ANONYMOUS
+      type: custom
+      authorizerClass: org.apache.kafka.metadata.authorizer.StandardAuthorizer
+    template:
+      pod:
+        metadata:
+          labels:
+            app: "kafka-client"  
+    config:
+      auto.create.topics.enable: false
+      auto.leader.rebalance.enable: true
+      default.replication.factor: 1
+      transaction.state.log.min.isr: 1
+      transaction.state.log.replication.factor: 1      
+      offsets.topic.replication.factor: 1      
+      min.insync.replicas: 1
+      delete.topic.enable: true
+      group.initial.rebalance.delay.ms: 0
+      leader.imbalance.check.interval.seconds: 300
+      leader.imbalance.per.broker.percentage: 10
+      log.flush.interval.ms: 240000
+      log.flush.scheduler.interval.ms: 120000
+      log.retention.hours: 168
+      num.io.threads: 8
+      num.network.threads: 3
+      num.partitions: 1
+      num.recovery.threads.per.data.dir: 1
+      offsets.commit.required.acks: -1
+      offsets.topic.num.partitions: 50
+      queued.max.requests: 500
+      replica.fetch.max.bytes: 1048576
+      replica.selector.class: org.apache.kafka.common.replica.RackAwareReplicaSelector
+      socket.receive.buffer.bytes: 102400
+      socket.request.max.bytes: 104857600
+      socket.send.buffer.bytes: 102400
+      ssl.enabled.protocols: TLSv1.3,TLSv1.2
+      ssl.protocol: TLS
+      unclean.leader.election.enable: false      
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+    jvmOptions:
+      -Xms: 1G
+      -Xmx: 2G
+      -XX:
+        ExitOnOutOfMemoryError: "true"
+        ExplicitGCInvokesConcurrent: "true"
+        G1HeapRegionSize: 16M
+        InitiatingHeapOccupancyPercent: "35"
+        MaxGCPauseMillis: "20"
+        MaxMetaspaceFreeRatio: "80"
+        MetaspaceSize: 96m
+        MinMetaspaceFreeRatio: "50"
+        UseG1GC: "true"
+    storage:
+      type: persistent-claim
+      size: 3Gi
+      class: standard
+      deleteClaim: true
+  entityOperator:
+    userOperator:
+      resources:
+        limits:
+          cpu: 600m
+          memory: 512Mi
+        requests:
+          cpu: 30m
+          memory: 200Mi
+      secretPrefix: kafka-
+      watchedNamespace: {{ .Release.Namespace }} 

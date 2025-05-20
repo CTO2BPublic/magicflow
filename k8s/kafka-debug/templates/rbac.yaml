@@ -1,0 +1,11 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kafka-debug
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    {{- range $key, $value := .Values.serviceAccount.annotations }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+   

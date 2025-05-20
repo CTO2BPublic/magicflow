@@ -1,0 +1,4 @@
+apiVersion: v2
+name: kafka-debug
+description: Kafka Debug
+version: 0.1.0
