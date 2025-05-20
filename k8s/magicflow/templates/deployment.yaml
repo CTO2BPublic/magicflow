@@ -49,8 +49,7 @@ spec:
            name: magicflow
            imagePullPolicy: Always
            securityContext:
-            runAsUser: 1001
-            runAsGroup: 1001
+             runAsUser: 0
            resources:
               limits:
                 memory: "2Gi"
@@ -72,7 +71,7 @@ spec:
              - name: APP_SASL_PASSWORD
                valueFrom:
                  secretKeyRef:
-                   name: kafka-magicflow-user
+                   name: kafka-super-user
                    key: password
              - name: CLOUD
                value: {{ .Values.metadata.cloud | default "aws" }}
@@ -108,5 +107,5 @@ spec:
              emptyDir: {}
            - name: ca
              secret:
-              secretName: kafka-sasl-cert
+              secretName: {{ .Values.caSecret }}
               optional: false        

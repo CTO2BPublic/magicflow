@@ -1,0 +1,85 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-debug
+  labels:
+    app: kafka-debug
+    app.kubernetes.io/component: kafka-debug
+  namespace: {{ .Release.Namespace }}    
+spec:
+  selector:
+     matchLabels:
+        app: kafka-debug
+  strategy:
+    type: Recreate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kafka-debug
+    spec:
+      imagePullSecrets:
+        - name: registry-credentials
+      serviceAccountName: kafka-debug
+      securityContext:
+#        runAsNonRoot: true
+        runAsUser: 0
+        fsGroup: 0
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: 3
+      initContainers:
+        - name: kafka-truststore
+          image: "ghcr.io/cto2bpublic/kafka-debug:{{ .Values.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: Always
+          command:
+            - "/bin/sh"
+            - "-c"
+            - "keytool -importcert -alias strimzi-kafka-cert -file /ca/ca.crt -keystore /truststore/cacerts -noprompt -storepass $TRUSTSTORE_PASS"
+          env:
+            - name: TRUSTSTORE_PASS
+              value: "{{ .Values.truststorePassword }}"
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: 500m
+            requests:
+              memory: "256Mi"
+              cpu: 100m
+          volumeMounts:
+            - name: truststore
+              mountPath: /truststore
+            - name: ca
+              mountPath: /ca
+              readOnly: true    
+      containers:
+        - name: kafka-debug
+          image: "ghcr.io/cto2bpublic/kafka-debug:{{ .Values.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: Always
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:         
+            - name: TRUSTSTORE_PASSWORD
+              value: "{{ .Values.truststorePassword }}"
+            - name: KAFKA_JAAS_CONFIG
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-super-user 
+                  key: sasl.jaas.config                   
+           {{- range .Values.enVars }}
+            - name: {{ .name }}
+              value: {{ .value | quote  }}
+           {{- end }}                                     
+          volumeMounts:
+            - name: truststore
+              mountPath: /tmp/truststore
+      volumes:
+        - name: truststore
+          emptyDir: {}
+        - name: ca
+          secret:
+            secretName: {{ .Values.kafkaCertSecretName }}
+            optional: false              

@@ -24,17 +24,39 @@ pullSecrets:
 
 
 deployments:
+  crds:
+    helm:
+      chart:
+        path: ./k8s/crds
+  strimzi:
+    helm:
+      chart:
+        name: oci://quay.io/strimzi-helm/strimzi-kafka-operator
+  kafka:
+    helm:
+      chart:
+        path: ./k8s/kafka
+  kafka-debug:
+    helm:
+      chart:
+        path: ./k8s/kafka-debug
+      values:
+        enVars:
+          - name: KAFKA_BOOTSTRAP_SERVERS
+            value: "kafka-client-kafka-bootstrap:9093"
+        truststorePassword: changeme
+        kafkaCertSecretName: kafka-client-cluster-ca-cert
   magicflow:
     helm:
       chart:
-        path: ./k8s/
+        path: ./k8s/magicflow
       values:
         metadata:
           name: magicflow
           labels:
             app: magicflow
         version: latest
-  
+        caSecret: kafka-client-cluster-ca-cert
 dev:
   magicflow:
     labelSelector:
@@ -45,7 +67,9 @@ dev:
     - name: APP_LOGLEVEL
       value: "debug"  
     - name: APP_BOOTSTRAP_SERVERS
-      value: "kafka-client-kafka-bootstrap.sview.svc.cluster.local:9093"
+      value: "kafka-client-kafka-bootstrap:9093"
+    - name: APP_SASL_USERNAME
+      value: "super-user"
     - name: PYTHONASYNCIODEBUG
       value: "1"  
     - name: CLOUD
@@ -56,6 +80,6 @@ dev:
       value: "dev"
     sync:
       - path: magicflow/:/magicflow/
-        startContainer: false # Will start the container after sync is done
+        startContainer: true # Will start the container after sync is done
         onUpload:
           restartContainer: true    

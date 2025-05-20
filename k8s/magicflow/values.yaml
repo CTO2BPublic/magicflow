@@ -7,8 +7,9 @@ logging: info
 truststoreCert: false
 bootstrapServers: "kafka-client-kafka-bootstrap.sview.svc.cluster.local"
 port: 9093
+caSecret: "kafka-sasl-cert"
 truststorePassword: "changeme"
 kafkaACL:
-  enabled: true
+  enabled: false
 
 metadata: {}

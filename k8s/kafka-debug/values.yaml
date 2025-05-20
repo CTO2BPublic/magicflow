@@ -1,0 +1,21 @@
+resources:
+  limits:
+    memory: "1024Mi"
+    cpu: 1500m
+  requests:
+    memory: "512Mi"
+    cpu: 100m
+
+affinity: {}
+
+tag: latest
+truststorePassword: changeme
+
+enVars:
+  - name: KAFKA_BOOTSTRAP_SERVERS
+    value: "kafka-client-kafka-bootstrap.sview.svc.cluster.local:9093"      
+
+kafkaCertSecretName: kafka-client-clients-ca-cert
+
+serviceAccount:
+  annotations: {}
